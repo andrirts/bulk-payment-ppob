@@ -1,0 +1,28 @@
+{
+  "name": "bulk-payment-ppob",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "axios": "^1.7.7",
+    "bulk-payment-ppob": "file:",
+    "crypto-js": "^4.2.0",
+    "dotenv": "^16.4.5",
+    "exceljs": "^4.4.0",
+    "express": "^4.21.1",
+    "moment": "^2.30.1",
+    "multer": "^1.4.5-lts.1",
+    "pg": "^8.13.1",
+    "sequelize": "^6.37.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
+}
