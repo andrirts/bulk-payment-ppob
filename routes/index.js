@@ -1,15 +1,7 @@
-const PLNController = require("../controllers/pln.controller");
-const asyncHandler = require("../utils/asyncHandler");
+const plnRouter = require('./pln-pasca.route');
 
-const router = require("express").Router();
-const multer = require("multer");
+const router = require('express').Router();
 
-const upload = multer({
-    dest: "uploads/"
-})
-
-router.post('/inquiry',
-    upload.single("file"),
-    asyncHandler(PLNController.inquiry.bind(PLNController)));
+router.use('/pln-pasca', plnRouter);
 
 module.exports = router;

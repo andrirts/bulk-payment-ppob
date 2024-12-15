@@ -1,9 +1,9 @@
 const { Model, DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 
-class PLN extends Model {}
+class PLNPasca extends Model { }
 
-PLN.init(
+PLNPasca.init(
   {
     id: {
       allowNull: false,
@@ -63,9 +63,17 @@ PLN.init(
       allowNull: true,
       type: DataTypes.STRING,
     },
+    keterangan: {
+      allowNull: true,
+      type: DataTypes.STRING,
+    },
     is_inquiry: {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
+    },
+    payment_id: {
+      allowNull: true,
+      type: DataTypes.STRING
     },
     is_paid: {
       type: DataTypes.BOOLEAN,
@@ -74,10 +82,10 @@ PLN.init(
   },
   {
     sequelize,
-    modelName: "pln",
+    modelName: "pln_pasca",
     underscored: true,
     timestamps: true,
   }
 );
 
-module.exports = PLN;
+module.exports = PLNPasca;
