@@ -13,7 +13,7 @@ class PLNPrepaidController {
                 }
                 data["order_id"] = data["Order ID"]["result"];
                 data["customer_id"] = data["Customer ID"];
-                data["product_code"] = data["Product Code"];
+                data["product_code"] = "CPLNPRA";
                 data["operator"] = "PLN TOKEN"
                 delete data["Order ID"];
                 delete data["Customer ID"];

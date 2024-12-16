@@ -4,7 +4,7 @@ const { PAYMENT_ACCOUNT_CONFIG, URL_CONFIG } = require("../config/constants");
 
 class PaymentService {
 
-    static async inqTransactions(payload,) {
+    static async inqTransactions(payload) {
         const data = {
             id: PAYMENT_ACCOUNT_CONFIG.partnerId,
             pin: PAYMENT_ACCOUNT_CONFIG.pin,
@@ -37,7 +37,7 @@ class PaymentService {
         }
         const customer_name = doTransaction.data.detail.data4;
         const base_bill = doTransaction.data.detail.data1;
-        const admin_fee = 2900;
+        const admin_fee = payload.admin_fee;
         const price = +base_bill + admin_fee;
         const tarif_daya = doTransaction.data.detail.data7;
         const stan_meter = doTransaction.data.detail.data6;
@@ -197,6 +197,61 @@ class PaymentService {
         }
 
         return results;
+    }
+
+    static async inqPLNPraTransactions() {
+        const data = {
+            id: PAYMENT_ACCOUNT_CONFIG.partnerId,
+            pin: PAYMENT_ACCOUNT_CONFIG.pin,
+            user: PAYMENT_ACCOUNT_CONFIG.username,
+            pass: PAYMENT_ACCOUNT_CONFIG.password,
+            kodeproduk: payload.product_code,
+            tujuan: payload.customer_id,
+            idtrx: payload.id,
+            jenis: 5,
+        };
+        const doTransaction = await axios.post(URL_CONFIG.transactionUrl, data);
+        // console.log(doTransaction.data);
+        if (!doTransaction.data) {
+            return {
+                id: payload.id,
+                customer_id: payload.customer_id,
+                product_code: payload.product_code,
+                error: true,
+                keterangan: "Gagal Inquiry"
+            }
+        }
+        if (doTransaction.data.rc !== '00') {
+            return {
+                id: payload.id,
+                customer_id: payload.customer_id,
+                product_code: payload.product_code,
+                error: true,
+                keterangan: doTransaction.data.msg
+            }
+        }
+        const customer_name = doTransaction.data.detail.data4;
+        const base_bill = doTransaction.data.detail.data1;
+        const admin_fee = payload.admin_fee;
+        const price = +base_bill + admin_fee;
+        const tarif_daya = doTransaction.data.detail.data7;
+        const stan_meter = doTransaction.data.detail.data6;
+        const periode = doTransaction.data.detail.data5;
+        return {
+            id: payload.id,
+            customer_id: payload.customer_id,
+            product_code: payload.product_code,
+            customer_name,
+            base_bill,
+            admin_fee,
+            price,
+            tarif_daya,
+            stan_meter,
+            periode,
+            is_inquiry: true,
+            keterangan: "Success Inquiry",
+            payment_id: payload.createdAt.getTime() + payload.id
+        };
     }
 
     static async payPrepaidTransactions(payload) {

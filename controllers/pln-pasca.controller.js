@@ -18,7 +18,8 @@ class PLNPascaController {
                 data["order_id"] = data["Order ID"]["result"];
                 data["customer_id"] = data["Customer ID"];
                 data["product_code"] = data["Product Code"];
-                data["operator"] = "PLN POSTPAID"
+                data["operator"] = "PLN POSTPAID";
+                data['admin_fee'] = 2900
                 delete data["Order ID"];
                 delete data["Customer ID"];
                 delete data["Product Code"];
