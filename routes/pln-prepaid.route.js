@@ -14,6 +14,12 @@ router.post(
   asyncHandler(PLNPrepaidController.inquiry.bind(PLNPrepaidController))
 );
 
+router.post(
+  "/payment",
+  upload.single("file"),
+  asyncHandler(PLNPrepaidController.payment.bind(PLNPrepaidController))
+);
+
 // router.post('/payment',
 //     upload.single("file"),
 //     asyncHandler(PLNPascaController.payment.bind(PLNPascaController)));

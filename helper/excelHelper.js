@@ -44,19 +44,20 @@ class ExcelHelper {
         ]
 
         for (const data of datas) {
+            const detail = data.detail;
             const transaction_id = data.id;
             const customer_id = data.customer_id;
             const order_id = data.order_id;
             const product_code = data.product_code;
             const operator = data.operator;
-            const base_bill = data.base_bill;
-            const admin_fee = data.admin_fee;
-            const price = data.price;
-            const customer_name = data.customer_name;
-            const stan_meter = data.stan_meter;
-            const periode = data.periode;
-            const tarif_daya = data.tarif_daya;
-            const keterangan = data.keterangan;
+            const base_bill = detail.base_bill;
+            const admin_fee = detail.admin_fee;
+            const price = detail.price;
+            const customer_name = detail.customer_name;
+            const stan_meter = detail.stan_meter;
+            const periode = detail.periode;
+            const tarif_daya = detail.tarif_daya;
+            const keterangan = data.information;
             worksheet.addRow({ transaction_id, customer_id, order_id, product_code, operator, base_bill, admin_fee, price, customer_name, stan_meter, periode, tarif_daya, keterangan });
         }
         worksheet.getRow(1).font = { bold: true };
@@ -91,23 +92,65 @@ class ExcelHelper {
         ]
 
         for (const data of datas) {
+            const detail = data.detail;
             const transaction_id = data.payment_id;
             const customer_id = data.customer_id;
             const order_id = data.order_id;
             const product_code = data.product_code;
             const operator = data.operator;
-            const base_bill = data.base_bill;
             const admin_fee = data.admin_fee;
-            const price = data.price;
-            const customer_name = data.customer_name;
-            const stan_meter = data.stan_meter;
-            const periode = data.periode;
-            const tarif_daya = data.tarif_daya;
-            const keterangan = data.keterangan;
-            const sn = data.sn
+            const base_bill = detail.base_bill;
+            const price = detail.price;
+            const customer_name = detail.customer_name;
+            const stan_meter = detail.stan_meter;
+            const periode = detail.periode;
+            const tarif_daya = detail.tarif_daya;
+            const keterangan = data.information;
+            const sn = detail.sn
             const payment_date = moment(data.payment_date).format("YYYY-MM-DD HH:mm:ss")
             worksheet.addRow({ transaction_id, customer_id, order_id, product_code, operator, base_bill, admin_fee, price, customer_name, stan_meter, periode, tarif_daya, keterangan, sn, payment_date });
         }
+        worksheet.getRow(1).font = { bold: true };
+        worksheet.views = [
+            {
+                state: 'frozen', ySplit: 1
+            }
+        ]
+        const buffer = await workbook.xlsx.writeBuffer();
+        return buffer;
+    }
+
+    static async writeInquiryPLNPrepaidToExcel(datas) {
+        const workbook = new ExcelJs.Workbook();
+        const worksheet = workbook.addWorksheet("Inquiry");
+        worksheet.columns = [
+            { header: 'Transaction ID', key: 'transaction_id', width: 10 },
+            { header: 'Customer ID', key: 'customer_id', width: 10 },
+            { header: 'Order ID', key: 'order_id', width: 10 },
+            { header: 'Product Code', key: 'product_code', width: 10 },
+            { header: 'Operator', key: 'operator', width: 10 },
+            { header: 'Base Bill', key: 'base_bill', width: 10 },
+            { header: 'Admin Fee', key: 'admin_fee', width: 10 },
+            { header: 'Price', key: 'price', width: 10 },
+            { header: 'Customer Name', key: 'customer_name', width: 10 },
+            { header: 'Keterangan', key: 'keterangan', width: 10 },
+        ]
+
+        for (const data of datas) {
+            const detail = data.detail;
+            const transaction_id = data.id;
+            const customer_id = data.customer_id;
+            const order_id = data.order_id;
+            const product_code = data.product_code;
+            const admin_fee = data.admin_fee;
+            const operator = data.operator;
+            const base_bill = detail.base_bill;
+            const price = detail.price;
+            const customer_name = detail.customer_name;
+            const keterangan = data.information;
+            worksheet.addRow({ transaction_id, customer_id, order_id, product_code, operator, base_bill, admin_fee, price, customer_name, keterangan });
+        }
+
         worksheet.getRow(1).font = { bold: true };
         worksheet.views = [
             {
