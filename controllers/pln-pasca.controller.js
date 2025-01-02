@@ -1,6 +1,5 @@
 const ExcelHelper = require("../helper/excelHelper");
 const PaymentService = require("../services/payment.service");
-const PLNPascaService = require("../services/pln-pasca.service");
 const TransactionService = require("../services/transaction.service");
 
 class PLNPascaController {
@@ -116,21 +115,6 @@ class PLNPascaController {
         res.setHeader("Content-Disposition", "attachment; filename=History.xlsx");
         return res.status(200).send(generateExcel);
     }
-
-    //   static async processTransactions(insertedDatas) {
-    //     const datas = [];
-    //     const errorDatas = [];
-    //     for (const data of insertedDatas) {
-    //       try {
-    //         const transactions = await PaymentService.transactions(data);
-    //         if (transactions.error) errorDatas.push(transactions);
-    //         else datas.push(transactions);
-    //       } catch (err) {
-    //         errorDatas.push({ error: true, message: err.message });
-    //       }
-    //     }
-    //     return [datas, errorDatas];
-    //   }
 }
 
 module.exports = PLNPascaController;

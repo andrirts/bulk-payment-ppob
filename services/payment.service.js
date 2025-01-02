@@ -240,6 +240,7 @@ class PaymentService {
         const admin_fee = payload.admin_fee;
         const price = +base_bill + +admin_fee;
         const no_meter = doTransaction.data.detail.data6;
+        const tarif_daya = doTransaction.data.detail.data7;
 
         return {
             id: payload.id,
@@ -250,7 +251,8 @@ class PaymentService {
                 customer_name,
                 base_bill,
                 price,
-                no_meter
+                no_meter,
+                tarif_daya,
             },
             is_inquiry: true,
             information: "Success Inquiry",
@@ -266,27 +268,14 @@ class PaymentService {
             pass: PAYMENT_ACCOUNT_CONFIG.password,
             kodeproduk: payload.product_code,
             tujuan: payload.customer_id,
-            idtrx: payload.id,
+            idtrx: payload.payment_id,
             jenis: 1,
         };
-        // const doTransaction = await axios.post(URL_CONFIG.transactionUrl, data);
-        const doTransaction = {
-            data: {
-                success: true,
-                idtrx: "148741",
-                tujuan: "521031296570",
-                kode: "PLNFR500",
-                reffid: payload.id,
-                harga: 502900,
-                rc: "68",
-                sn: "",
-                status: 0,
-                msg: "Trx masih dalam proses"
-            }
-        }
+        const doTransaction = await axios.post(URL_CONFIG.transactionUrl, data);
         if (!doTransaction.data) {
             return {
                 id: payload.id,
+                payment_id: payload.payment_id,
                 customer_id: payload.customer_id,
                 product_code: payload.product_code,
                 error: true,
@@ -296,6 +285,7 @@ class PaymentService {
         if (doTransaction.data.rc != "68") {
             return {
                 id: payload.id,
+                payment_id: payload.payment_id,
                 customer_id: payload.customer_id,
                 product_code: payload.product_code,
                 error: true,
@@ -312,6 +302,7 @@ class PaymentService {
         if (finalStatusData.rc != '00') {
             return {
                 id: payload.id,
+                payment_id: payload.payment_id,
                 customer_id: payload.customer_id,
                 product_code: payload.product_code,
                 error: true,
@@ -323,22 +314,21 @@ class PaymentService {
         const sn = await this.findStringBetweenText(detailData, "/TOKEN:", "/PPN:");
         const tarif_daya = await this.findStringBetweenText(detailData, "/TARIFDAYA:", "/PLNREF:")
         const total_kwh = await this.findStringBetweenText(detailData, "/JUMLAHKWH:", "");
-        const materia = await this.findStringBetweenText(detailData, "/MATERAI:", "/TOKEN:")
+        const materai = await this.findStringBetweenText(detailData, "/MATERAI:", "/TOKEN:")
         const ppn = await this.findStringBetweenText(detailData, "/PPN:", "/PPJ:")
         const ppj = await this.findStringBetweenText(detailData, "/PPJ:", "/ANGSURAN:")
         const angsuran = await this.findStringBetweenText(detailData, "/ANGSURAN:", "//RPTOKEN:");
         const rp_stroom = await this.findStringBetweenText(detailData, "/RPTOKEN:", "/JUMLAHKWH:");
-        console.log(sn);
         return {
             id: payload.id,
             customer_id: payload.customer_id,
             product_code: payload.product_code,
             detail: {
-                // ...payload.detail,
+                ...payload.detail,
                 sn,
                 tarif_daya,
                 total_kwh,
-                materia,
+                materai,
                 ppn,
                 ppj,
                 angsuran,
