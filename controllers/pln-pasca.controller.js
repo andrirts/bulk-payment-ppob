@@ -14,7 +14,7 @@ class PLNPascaController {
                 ) {
                     throw new Error("Some rows is not valid");
                 }
-                data["order_id"] = data["Order ID"]["result"];
+                data["order_id"] = data["Order ID"];
                 data["customer_id"] = data["Customer ID"];
                 data["product_code"] = data["Product Code"];
                 data["operator"] = "PLN POSTPAID";

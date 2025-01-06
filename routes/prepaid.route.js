@@ -1,11 +1,17 @@
 
 const PrepaidController = require("../controllers/prepaid.controller");
 const asyncHandler = require("../utils/asyncHandler");
+const multer = require("multer");
+
+const upload = multer({
+    dest: "uploads/",
+});
 
 const router = require("express").Router();
 
 router.post('/payment',
-    asyncHandler(PrepaidController.transactions.bind(PrepaidController))
+    upload.single("file"),
+    asyncHandler(PrepaidController.payment.bind(PrepaidController))
 );
 
 router.post('/callback',

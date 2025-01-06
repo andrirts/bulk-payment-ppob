@@ -7,8 +7,6 @@ const syncModels = async () => {
   await sequelize.authenticate();
   console.log("Connection has been established successfully.");
 
-  await PLNPasca.sync({ alter: true });
-  await PLNPrepaid.sync({ alter: true });
   await Transaction.sync({ alter: true });
 
   console.log("Models created/updated successfully.");
