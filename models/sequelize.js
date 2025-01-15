@@ -1,6 +1,4 @@
 const sequelize = require("../config/database");
-const PLNPrepaid = require("./pln-prepaid.model");
-const PLNPasca = require("./pln-pasca.model");
 const Transaction = require("./transaction.model");
 
 const syncModels = async () => {

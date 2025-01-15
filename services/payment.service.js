@@ -5,7 +5,7 @@ const nodeCacheService = require("../services/node-cache.service");
 const moment = require("moment");
 
 class PaymentService {
-    static async inqTransactions(payload) {
+    static async inqPLNPostpaidTransactions(payload) {
         const data = {
             id: PAYMENT_ACCOUNT_CONFIG.partnerId,
             pin: PAYMENT_ACCOUNT_CONFIG.pin,
@@ -62,7 +62,7 @@ class PaymentService {
         };
     }
 
-    static async payTransactions(payload) {
+    static async payPLNPostpaidTransactions(payload) {
         const data = {
             id: PAYMENT_ACCOUNT_CONFIG.partnerId,
             pin: PAYMENT_ACCOUNT_CONFIG.pin,
@@ -437,6 +437,211 @@ class PaymentService {
             is_paid: true,
             information: "Success Payment",
             payment_date: moment().format("YYYY-MM-DD HH:mm:ss"),
+        };
+    }
+
+    static async inqPDAMTransactions(payload) {
+        const data = {
+            id: PAYMENT_ACCOUNT_CONFIG.partnerId,
+            pin: PAYMENT_ACCOUNT_CONFIG.pin,
+            user: PAYMENT_ACCOUNT_CONFIG.username,
+            pass: PAYMENT_ACCOUNT_CONFIG.password,
+            kodeproduk: payload.product_code,
+            tujuan: payload.customer_id,
+            idtrx: payload.id,
+            jenis: 5,
+        };
+        const doTransaction = await axios.post(URL_CONFIG.transactionUrl, data);
+        // console.log(doTransaction.data);
+        if (!doTransaction.data) {
+            return {
+                id: payload.id,
+                customer_id: payload.customer_id,
+                product_code: payload.product_code,
+                error: true,
+                information: "Gagal Inquiry",
+            };
+        }
+        if (doTransaction.data.rc !== "00") {
+            return {
+                id: payload.id,
+                customer_id: payload.customer_id,
+                product_code: payload.product_code,
+                error: true,
+                information: doTransaction.data.msg,
+            };
+        }
+        const customer_name = doTransaction.data.detail.data4;
+        const base_bill = doTransaction.data.detail.data1;
+        const admin_fee = doTransaction.data.detail.data2;
+        const price = +base_bill + +admin_fee;
+        const stan_meter = doTransaction.data.detail.data6;
+        const periode = doTransaction.data.detail.data5;
+        return {
+            id: payload.id,
+            customer_id: payload.customer_id,
+            product_code: payload.product_code,
+            admin_fee,
+            detail: {
+                customer_name,
+                base_bill,
+                price,
+                stan_meter,
+                periode,
+            },
+            is_inquiry: true,
+            information: "Success Inquiry",
+            payment_id: payload.createdAt.getTime() + payload.id,
+        };
+    }
+
+    static async payPDAMTransactions(payload) {
+        const data = {
+            id: PAYMENT_ACCOUNT_CONFIG.partnerId,
+            pin: PAYMENT_ACCOUNT_CONFIG.pin,
+            user: PAYMENT_ACCOUNT_CONFIG.username,
+            pass: PAYMENT_ACCOUNT_CONFIG.password,
+            kodeproduk: payload.product_code,
+            tujuan: payload.customer_id,
+            idtrx: payload.payment_id,
+            jenis: 6,
+        };
+        console.log(data);
+        const doTransaction = await axios.post(URL_CONFIG.transactionUrl, data);
+        console.log(doTransaction.data);
+        if (!doTransaction.data) {
+            return {
+                id: payload.id,
+                payment_id: payload.payment_id,
+                customer_id: payload.customer_id,
+                product_code: payload.product_code,
+                error: true,
+                information: doTransaction.data.msg,
+            };
+        }
+        if (doTransaction.data.rc !== "00") {
+            return {
+                id: payload.id,
+                payment_id: payload.payment_id,
+                customer_id: payload.customer_id,
+                product_code: payload.product_code,
+                error: true,
+                information: doTransaction.data.msg,
+            };
+        }
+        const sn = doTransaction.data.sn;
+        return {
+            id: payload.id,
+            payment_id: payload.payment_id,
+            customer_id: payload.customer_id,
+            product_code: payload.product_code,
+            detail: {
+                ...payload.detail,
+                sn,
+            },
+            information: "Berhasil Bayar",
+        };
+    }
+
+    static async inqPostpaidTransactions(payload) {
+        const data = {
+            id: PAYMENT_ACCOUNT_CONFIG.partnerId,
+            pin: PAYMENT_ACCOUNT_CONFIG.pin,
+            user: PAYMENT_ACCOUNT_CONFIG.username,
+            pass: PAYMENT_ACCOUNT_CONFIG.password,
+            kodeproduk: payload.product_code,
+            tujuan: payload.customer_id,
+            idtrx: payload.id,
+            jenis: 5,
+        };
+        const doTransaction = await axios.post(URL_CONFIG.transactionUrl, data);
+        // console.log(doTransaction.data);
+        if (!doTransaction.data) {
+            return {
+                id: payload.id,
+                customer_id: payload.customer_id,
+                product_code: payload.product_code,
+                error: true,
+                information: "Gagal Inquiry",
+            };
+        }
+        if (doTransaction.data.rc !== "00") {
+            return {
+                id: payload.id,
+                customer_id: payload.customer_id,
+                product_code: payload.product_code,
+                error: true,
+                information: doTransaction.data.msg,
+            };
+        }
+        const customer_name = doTransaction.data.detail.data4;
+        const base_bill = doTransaction.data.detail.data1;
+        const admin_fee = payload.admin_fee;
+        const price = +base_bill + +admin_fee;
+        const periode = doTransaction.data.detail.data5;
+        console.log(doTransaction.data);
+        return {
+            id: payload.id,
+            customer_id: payload.customer_id,
+            product_code: payload.product_code,
+            admin_fee,
+            detail: {
+                customer_name,
+                base_bill,
+                price,
+                periode
+            },
+            is_inquiry: true,
+            information: "Success Inquiry",
+            payment_id: payload.createdAt.getTime() + payload.id,
+        };
+    }
+
+    static async payPostpaidTransactions(payload) {
+        const data = {
+            id: PAYMENT_ACCOUNT_CONFIG.partnerId,
+            pin: PAYMENT_ACCOUNT_CONFIG.pin,
+            user: PAYMENT_ACCOUNT_CONFIG.username,
+            pass: PAYMENT_ACCOUNT_CONFIG.password,
+            kodeproduk: payload.product_code,
+            tujuan: payload.customer_id,
+            idtrx: payload.payment_id,
+            jenis: 6,
+        };
+        console.log(data);
+        const doTransaction = await axios.post(URL_CONFIG.transactionUrl, data);
+        console.log(doTransaction.data);
+        if (!doTransaction.data) {
+            return {
+                id: payload.id,
+                payment_id: payload.payment_id,
+                customer_id: payload.customer_id,
+                product_code: payload.product_code,
+                error: true,
+                information: doTransaction.data.msg,
+            };
+        }
+        if (doTransaction.data.rc !== "00") {
+            return {
+                id: payload.id,
+                payment_id: payload.payment_id,
+                customer_id: payload.customer_id,
+                product_code: payload.product_code,
+                error: true,
+                information: doTransaction.data.msg,
+            };
+        }
+        const sn = doTransaction.data.sn;
+        return {
+            id: payload.id,
+            payment_id: payload.payment_id,
+            customer_id: payload.customer_id,
+            product_code: payload.product_code,
+            detail: {
+                ...payload.detail,
+                sn,
+            },
+            information: "Berhasil Bayar",
         };
     }
 }

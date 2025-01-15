@@ -5,7 +5,6 @@ const TransactionService = require("../services/transaction.service");
 
 class PLNPrepaidController {
     static async inquiry(req, res, next) {
-        console.log("test");
         const file = req.file;
         const datas = (await ExcelHelper.convertExcelDataToArray(file)).map(
             (data) => {
@@ -16,7 +15,7 @@ class PLNPrepaidController {
                 ) {
                     throw new Error("Some rows is not valid");
                 }
-                data["order_id"] = data["Order ID"]["result"];
+                data["order_id"] = data["Order ID"];
                 data["customer_id"] = data["Customer ID"];
                 data["product_code"] = data["Product Code"];
                 data["operator"] = "PLN TOKEN";
@@ -73,6 +72,39 @@ class PLNPrepaidController {
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         );
         res.setHeader("Content-Disposition", "attachment; filename=Payment.xlsx");
+        return res.status(200).send(generateExcel);
+    }
+    static async historyPayment(req, res, next) {
+        const file = req.file;
+        const datas = (await ExcelHelper.convertExcelDataToArray(file)).map(
+            (data) => {
+                if (
+                    data["Transaction ID"] === undefined ||
+                    data["Order ID"] === undefined ||
+                    data["Customer ID"] === undefined ||
+                    data["Product Code"] === undefined
+                ) {
+                    throw new Error("Some rows is not valid");
+                }
+                data["id"] = data["Transaction ID"];
+                data["order_id"] = data["Order ID"];
+                data["customer_id"] = data["Customer ID"];
+                data["product_code"] = data["Product Code"];
+                delete data["Transaction ID"];
+                delete data["Order ID"];
+                delete data["Customer ID"];
+                delete data["Product Code"];
+                return data;
+            }
+        );
+        const findDatas = await TransactionService.findByIds(datas);
+        const generateExcel = await ExcelHelper.writePaymentPLNPrepaidToExcel(findDatas);
+
+        res.setHeader(
+            "Content-Type",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        );
+        res.setHeader("Content-Disposition", "attachment; filename=History.xlsx");
         return res.status(200).send(generateExcel);
     }
 }

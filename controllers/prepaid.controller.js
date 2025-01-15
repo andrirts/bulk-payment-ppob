@@ -10,7 +10,6 @@ class PrepaidController {
     static async callback(req, res, next) {
         const data = req.body;
         const getRequestId = nodeCacheService.get(data.reffid);
-        console.log(data);
         // console.log(nodeCacheService.keys());
         console.log(getRequestId);
         if (!getRequestId) {
@@ -48,7 +47,7 @@ class PrepaidController {
                 }
                 data["customer_id"] = data["Customer ID"];
                 data["product_code"] = data["Product Code"];
-                data['order_id'] = data['Order ID']['result']
+                data['order_id'] = data['Order ID']
                 delete data["Customer ID"];
                 delete data["Product Code"];
                 delete data['Order ID'];

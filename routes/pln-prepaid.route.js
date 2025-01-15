@@ -20,12 +20,8 @@ router.post(
   asyncHandler(PLNPrepaidController.payment.bind(PLNPrepaidController))
 );
 
-// router.post('/payment',
-//     upload.single("file"),
-//     asyncHandler(PLNPascaController.payment.bind(PLNPascaController)));
-
-// router.post('/history',
-//     upload.single("file"),
-//     asyncHandler(PLNPascaController.historyPayment.bind(PLNPascaController)));
+router.post('/history',
+  upload.single("file"),
+  asyncHandler(PLNPrepaidController.historyPayment.bind(PLNPrepaidController)));
 
 module.exports = router;

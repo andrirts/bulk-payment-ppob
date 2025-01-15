@@ -3,8 +3,8 @@ const NodeCache = require('node-cache');
 class NodeCacheService {
     constructor() {
         this.cache = new NodeCache({
-            stdTTL: 300,
-            checkperiod: 120
+            stdTTL: 1800,
+            checkperiod: 300
         });
     }
     static getInstance() {
