@@ -11,7 +11,7 @@ class PrepaidController {
         const data = req.body;
         const getRequestId = nodeCacheService.get(data.reffid);
         // console.log(nodeCacheService.keys());
-        console.log(getRequestId);
+        // console.log(getRequestId);
         if (!getRequestId) {
             return res.status(404).json({
                 error: true,
@@ -41,10 +41,12 @@ class PrepaidController {
             (data) => {
                 if (
                     data["Customer ID"] === undefined ||
-                    data["Product Code"] === undefined
+                    data["Product Code"] === undefined ||
+                    data['Order ID'] === undefined
                 ) {
                     throw new Error("Some rows is not valid");
                 }
+                console.log(data);
                 data["customer_id"] = data["Customer ID"];
                 data["product_code"] = data["Product Code"];
                 data['order_id'] = data['Order ID']

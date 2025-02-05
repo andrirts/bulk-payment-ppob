@@ -539,6 +539,7 @@ class PaymentService {
                 ...payload.detail,
                 sn,
             },
+            payment_date: moment().format("YYYY-MM-DD HH:mm:ss"),
             information: "Berhasil Bayar",
         };
     }

@@ -395,6 +395,7 @@ class ExcelHelper {
             { header: "Transaction ID", key: "transaction_id", width: 10 },
             { header: "Customer ID", key: "customer_id", width: 10 },
             { header: "Order ID", key: "order_id", width: 10 },
+            { header: "Payment Date", key: "payment_date", width: 10 },
             { header: "Product Code", key: "product_code", width: 10 },
             { header: "Operator", key: "operator", width: 10 },
             { header: "Base Bill", key: "base_bill", width: 10 },
@@ -422,6 +423,7 @@ class ExcelHelper {
             const periode = detail ? detail.periode : "";
             const keterangan = data.information;
             const sn = detail ? detail.sn : "";
+            const payment_date = data.payment_date
             worksheet.addRow({
                 transaction_id,
                 customer_id,
@@ -435,7 +437,8 @@ class ExcelHelper {
                 stan_meter,
                 periode,
                 keterangan,
-                sn
+                sn,
+                payment_date
             });
         }
         worksheet.getRow(1).font = { bold: true };
