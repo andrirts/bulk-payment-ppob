@@ -12,6 +12,7 @@
   "description": "",
   "dependencies": {
     "axios": "^1.7.7",
+    "bcrypt": "^5.1.1",
     "bulk-payment-ppob": "file:",
     "crypto-js": "^4.2.0",
     "dotenv": "^16.4.5",
