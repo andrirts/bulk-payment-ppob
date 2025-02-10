@@ -7,7 +7,7 @@ const syncModels = async () => {
   console.log("Connection has been established successfully.");
 
   await Transaction.sync({ alter: true });
-  // await User.sync({ alter: true });
+  await User.sync({ alter: true });
   console.log("Models created/updated successfully.");
 };
 
