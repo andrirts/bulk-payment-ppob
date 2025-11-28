@@ -12,7 +12,7 @@ const router = require("express").Router();
 router.post(
   "/payment",
   upload.single("file"),
-  asyncHandler(AuthMiddleware.auth),
+  // asyncHandler(AuthMiddleware.auth),
   asyncHandler(PrepaidController.payment.bind(PrepaidController))
 );
 

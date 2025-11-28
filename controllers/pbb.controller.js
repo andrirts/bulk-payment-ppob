@@ -1,11 +1,11 @@
 const ExcelHelper = require("../helper/excelHelper");
-const nodeCacheService = require("../services/node-cache.service");
 const PaymentService = require("../services/payment.service");
 const TransactionService = require("../services/transaction.service");
 
-class PLNPrepaidController {
+class PBBController {
   static async inquiry(req, res, next) {
     const file = req.file;
+
     const { username, partner_id, pin, password } = req.body;
 
     const datas = (await ExcelHelper.convertExcelDataToArray(file)).map(
@@ -13,25 +13,28 @@ class PLNPrepaidController {
         if (
           data["Order ID"] === undefined ||
           data["Customer ID"] === undefined ||
-          data["Product Code"] === undefined
+          data["Product Code"] === undefined ||
+          data["Year"] === undefined
         ) {
           throw new Error("Some rows is not valid");
         }
         data["order_id"] = data["Order ID"];
         data["customer_id"] = data["Customer ID"];
         data["product_code"] = data["Product Code"];
-        data["operator"] = "PLN TOKEN";
-        data["admin_fee"] = 2900;
+        data["year"] = data["Year"];
+        data["operator"] = "PBB";
         delete data["Order ID"];
         delete data["Customer ID"];
         delete data["Product Code"];
+        delete data["Year"];
         return data;
       }
     );
+    // const validateDatas
     const insertedDatas = await TransactionService.insertDatas(datas);
     const dataTransactions = await PaymentService.processTransactions(
       insertedDatas,
-      PaymentService.inqPLNPrepaidTransactions,
+      PaymentService.inqPBBTransactions,
       {
         username,
         partner_id,
@@ -40,9 +43,8 @@ class PLNPrepaidController {
       }
     );
     const newDatas = await TransactionService.updateDatas(dataTransactions);
-    const generateExcel = await ExcelHelper.writeInquiryPLNPrepaidToExcel(
-      newDatas
-    );
+    const generateExcel = await ExcelHelper.writeInquiryPBBToExcel(newDatas);
+
     res.setHeader(
       "Content-Type",
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -53,10 +55,10 @@ class PLNPrepaidController {
 
   static async payment(req, res, next) {
     const file = req.file;
-    const { username, partner_id, pin, password } = req.body;
     const datas = (await ExcelHelper.convertExcelDataToArray(file)).map(
       (data) => {
         if (
+          data["Transaction ID"] === undefined ||
           data["Order ID"] === undefined ||
           data["Customer ID"] === undefined ||
           data["Product Code"] === undefined
@@ -64,9 +66,10 @@ class PLNPrepaidController {
           throw new Error("Some rows is not valid");
         }
         data["id"] = data["Transaction ID"];
-        data["order_id"] = data["Order ID"]["result"];
+        data["order_id"] = data["Order ID"];
         data["customer_id"] = data["Customer ID"];
         data["product_code"] = data["Product Code"];
+        delete data["Transaction ID"];
         delete data["Order ID"];
         delete data["Customer ID"];
         delete data["Product Code"];
@@ -76,18 +79,11 @@ class PLNPrepaidController {
     const findDatas = await TransactionService.findByIds(datas);
     const dataTransactions = await PaymentService.processTransactions(
       findDatas,
-      PaymentService.payPLNPrepaidTransactions.bind(PaymentService),
-      {
-        username,
-        partner_id,
-        pin,
-        password,
-      }
+      PaymentService.payPLNPostpaidTransactions
     );
+
     const newDatas = await TransactionService.updateDatas(dataTransactions);
-    const generateExcel = await ExcelHelper.writePaymentPLNPrepaidToExcel(
-      newDatas
-    );
+    const generateExcel = await ExcelHelper.writePaymentPLNToExcel(newDatas);
 
     res.setHeader(
       "Content-Type",
@@ -96,6 +92,7 @@ class PLNPrepaidController {
     res.setHeader("Content-Disposition", "attachment; filename=Payment.xlsx");
     return res.status(200).send(generateExcel);
   }
+
   static async historyPayment(req, res, next) {
     const file = req.file;
     const datas = (await ExcelHelper.convertExcelDataToArray(file)).map(
@@ -120,9 +117,7 @@ class PLNPrepaidController {
       }
     );
     const findDatas = await TransactionService.findByIds(datas);
-    const generateExcel = await ExcelHelper.writePaymentPLNPrepaidToExcel(
-      findDatas
-    );
+    const generateExcel = await ExcelHelper.writePaymentPLNToExcel(findDatas);
 
     res.setHeader(
       "Content-Type",
@@ -133,4 +128,4 @@ class PLNPrepaidController {
   }
 }
 
-module.exports = PLNPrepaidController;
+module.exports = PBBController;

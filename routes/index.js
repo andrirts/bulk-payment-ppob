@@ -4,6 +4,7 @@ const prepaidRouter = require("./prepaid.route");
 const pdamRouter = require("./pdam.route");
 const postpaidRouter = require("./postpaid.route");
 const userRouter = require("./user.route");
+const pbbRouter = require("./pbb.route");
 
 const router = require("express").Router();
 
@@ -18,5 +19,7 @@ router.use("/pdam", pdamRouter);
 router.use("/postpaid", postpaidRouter);
 
 router.use("/user", userRouter);
+
+router.use("/pbb", pbbRouter);
 
 module.exports = router;

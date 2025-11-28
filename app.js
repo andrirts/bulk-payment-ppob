@@ -12,13 +12,13 @@ app.set("trust proxy", true);
 app.use(router);
 
 app.use((err, req, res, next) => {
-    console.log(err);
-    res.status(500).json({
-        message: err.message,
-    });
+  console.log(err);
+  res.status(500).json({
+    message: err.message,
+  });
 });
 
 app.listen(port, async () => {
-    await syncModels();
-    console.log(`Example app listening on port ${port}`);
+  await syncModels();
+  console.log(`Example app listening on port ${port}`);
 });
