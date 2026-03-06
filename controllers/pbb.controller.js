@@ -55,6 +55,9 @@ class PBBController {
 
   static async payment(req, res, next) {
     const file = req.file;
+
+    const { username, partner_id, pin, password } = req.body;
+
     const datas = (await ExcelHelper.convertExcelDataToArray(file)).map(
       (data) => {
         if (
@@ -76,10 +79,18 @@ class PBBController {
         return data;
       }
     );
+    console.log(datas);
     const findDatas = await TransactionService.findByIds(datas);
+    console.log(findDatas);
     const dataTransactions = await PaymentService.processTransactions(
       findDatas,
-      PaymentService.payPLNPostpaidTransactions
+      PaymentService.payPBBTransactions,
+      {
+        username,
+        partner_id,
+        pin,
+        password,
+      }
     );
 
     const newDatas = await TransactionService.updateDatas(dataTransactions);

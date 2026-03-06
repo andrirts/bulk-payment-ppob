@@ -880,6 +880,89 @@ class PaymentService {
       payment_id: payload.createdAt.getTime() + payload.id,
     };
   }
+
+  static async payPBBTransactions(payload, user) {
+    const data = {
+      id: user.partner_id,
+      pin: user.pin,
+      user: user.username,
+      pass: user.password,
+      kodeproduk: payload.product_code,
+      tujuan: payload.customer_id,
+      idtrx: payload.payment_id,
+      year: payload.year,
+      jenis: 6,
+    };
+    // console.log(data);
+    const hashedPin = await PaymentService.sha256(data.pin);
+    const timestamp = moment().format("YYYY-MM-DD HH:mm:ss");
+    const sign = await PaymentService.sha1(
+      timestamp + data.id + hashedPin + data.kodeproduk + data.idtrx
+    );
+
+    const reqTrx = {
+      clientreff: data.idtrx,
+      customerno: data.tujuan,
+      productcode: data.kodeproduk,
+      type: data.jenis,
+      additionalid: data.year,
+    };
+
+    if (nodeCacheService.get(`${user.partner_id}:token`)) {
+      user.token = nodeCacheService.get(`${user.partner_id}:token`);
+    } else {
+      const login = await PaymentService.login({
+        username: data.user,
+        password: data.pass,
+      });
+      const token = login.data.token;
+      nodeCacheService.set(`${user.partner_id}:token`, token, 300);
+      user.token = token;
+    }
+    const token = user.token;
+    const doTransaction = await axios.post(URL_CONFIG.transactionUrl, reqTrx, {
+      headers: {
+        "Content-Type": "application/json",
+        partnerid: data.id,
+        pin: hashedPin,
+        timestamp: timestamp,
+        sign: sign,
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    console.log(doTransaction.data);
+    if (!doTransaction.data) {
+      return {
+        id: payload.id,
+        customer_id: payload.customer_id,
+        product_code: payload.product_code,
+        error: true,
+        information: "Gagal Inquiry",
+      };
+    }
+    if (doTransaction.data.rc !== "00") {
+      return {
+        id: payload.id,
+        customer_id: payload.customer_id,
+        product_code: payload.product_code,
+        error: true,
+        information: doTransaction.data.msg,
+      };
+    }
+    const sn = doTransaction.data.sn;
+    return {
+      id: payload.id,
+      payment_id: payload.payment_id,
+      customer_id: payload.customer_id,
+      product_code: payload.product_code,
+      detail: {
+        ...payload.detail,
+        sn,
+      },
+      information: "Berhasil Bayar",
+      payment_date: moment().format("YYYY-MM-DD HH:mm:ss"),
+    };
+  }
 }
 
 module.exports = PaymentService;

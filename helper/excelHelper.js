@@ -569,6 +569,67 @@ class ExcelHelper {
     const buffer = await workbook.xlsx.writeBuffer();
     return buffer;
   }
+
+  static async writePaymentPBBToExcel(datas) {
+    const workbook = new ExcelJs.Workbook();
+    const worksheet = workbook.addWorksheet("Payment");
+    worksheet.columns = [
+      { header: "Transaction ID", key: "transaction_id", width: 10 },
+      { header: "Customer ID", key: "customer_id", width: 10 },
+      { header: "Order ID", key: "order_id", width: 10 },
+      { header: "Product Code", key: "product_code", width: 10 },
+      { header: "Base Bill", key: "base_bill", width: 10 },
+      { header: "Admin Fee", key: "admin_fee", width: 10 },
+      { header: "Price", key: "price", width: 10 },
+      { header: "Customer Name", key: "customer_name", width: 10 },
+      { header: "Tahun Pajak", key: "tahun_pajak", width: 10 },
+      { header: "Alamat", key: "alamat", width: 10 },
+      { header: "Keterangan", key: "keterangan", width: 10 },
+      { header: "SN", key: "sn", width: 10 },
+      { header: "Payment Date", key: "payment_date", width: 10 },
+    ];
+
+    for (const data of datas) {
+      const detail = data.detail;
+      const transaction_id = data.id;
+      const customer_id = data.customer_id;
+      const order_id = data.order_id;
+      const product_code = data.product_code;
+      const base_bill = detail ? detail.base_bill : "";
+      const admin_fee = detail ? detail.admin_fee : "";
+      const price = detail ? detail.price : "";
+      const customer_name = detail ? detail.customer_name : "";
+      const tahun_pajak = detail ? detail.tahun_pajak : "";
+      const alamat = detail ? detail.alamat : "";
+      const keterangan = data.information;
+      const sn = detail ? detail.sn : "";
+      const payment_date = data.payment_date;
+      worksheet.addRow({
+        transaction_id,
+        customer_id,
+        order_id,
+        product_code,
+        base_bill,
+        admin_fee,
+        price,
+        customer_name,
+        alamat,
+        tahun_pajak,
+        keterangan,
+        sn,
+        payment_date,
+      });
+    }
+    worksheet.getRow(1).font = { bold: true };
+    worksheet.views = [
+      {
+        state: "frozen",
+        ySplit: 1,
+      },
+    ];
+    const buffer = await workbook.xlsx.writeBuffer();
+    return buffer;
+  }
 }
 
 module.exports = ExcelHelper;
